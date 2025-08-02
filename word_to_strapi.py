@@ -17,8 +17,25 @@ class WordToStrapiConverter:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Word to Strapi Converter")
-        self.root.geometry("800x600")
-        self.root.configure(bg='#f0f0f0')
+        self.root.geometry("900x700")
+        
+        # Modern color scheme
+        self.colors = {
+            'bg_primary': '#1a1a2e',      # Dark blue-gray
+            'bg_secondary': '#16213e',     # Slightly lighter blue-gray
+            'bg_accent': '#0f3460',        # Dark blue accent
+            'text_primary': '#ffffff',      # White text
+            'text_secondary': '#e8e8e8',   # Light gray text
+            'accent_primary': '#00d4aa',   # Teal accent
+            'accent_secondary': '#ff6b6b', # Coral accent
+            'button_primary': '#00d4aa',   # Teal button
+            'button_secondary': '#ff6b6b', # Coral button
+            'success': '#4CAF50',          # Green
+            'warning': '#ff9800',          # Orange
+            'error': '#f44336'             # Red
+        }
+        
+        self.root.configure(bg=self.colors['bg_primary'])
         
         # Template fields
         self.template_fields = [
@@ -34,51 +51,97 @@ class WordToStrapiConverter:
         ]
         
         self.setup_ui()
+        self.setup_hover_effects()
+    
+    def setup_hover_effects(self):
+        """Setup hover effects for buttons"""
+        def on_enter(event):
+            event.widget.configure(bg=self.colors['accent_primary'])
+            
+        def on_leave(event):
+            if event.widget == self.browse_btn:
+                event.widget.configure(bg=self.colors['button_primary'])
+            elif event.widget == self.convert_btn:
+                event.widget.configure(bg=self.colors['button_secondary'])
+        
+        # Bind hover effects
+        self.browse_btn.bind("<Enter>", on_enter)
+        self.browse_btn.bind("<Leave>", on_leave)
+        self.convert_btn.bind("<Enter>", on_enter)
+        self.convert_btn.bind("<Leave>", on_leave)
     
     def setup_ui(self):
         """Setup the user interface"""
         # Main frame
-        main_frame = tk.Frame(self.root, bg='#f0f0f0')
+        main_frame = tk.Frame(self.root, bg=self.colors['bg_primary'])
         main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
         
-        # Title
-        title_label = tk.Label(main_frame, text="Word to Strapi Converter", 
-                             font=("Arial", 18, "bold"), bg='#f0f0f0')
-        title_label.pack(pady=(0, 20))
+        # Title with gradient effect
+        title_frame = tk.Frame(main_frame, bg=self.colors['bg_primary'])
+        title_frame.pack(fill=tk.X, pady=(0, 20))
+        
+        title_label = tk.Label(title_frame, text="Word to Strapi Converter", 
+                             font=("Helvetica", 24, "bold"), 
+                             bg=self.colors['bg_primary'], 
+                             fg=self.colors['accent_primary'])
+        title_label.pack()
+        
+        subtitle_label = tk.Label(title_frame, text="Convert Word documents to Strapi layouts", 
+                                font=("Helvetica", 12), 
+                                bg=self.colors['bg_primary'], 
+                                fg=self.colors['text_secondary'])
+        subtitle_label.pack()
         
         # File selection frame
         file_frame = tk.LabelFrame(main_frame, text="Select Word Document", 
-                                 bg='#f0f0f0', font=("Arial", 12, "bold"))
+                                 bg=self.colors['bg_secondary'], 
+                                 fg=self.colors['text_primary'],
+                                 font=("Helvetica", 12, "bold"))
         file_frame.pack(fill=tk.X, pady=(0, 20))
         
         # File path display
         self.file_path_var = tk.StringVar()
         self.file_path_entry = tk.Entry(file_frame, textvariable=self.file_path_var, 
-                                      width=60, font=("Arial", 10))
+                                      width=60, font=("Helvetica", 10),
+                                      bg=self.colors['bg_accent'], 
+                                      fg=self.colors['text_primary'],
+                                      insertbackground=self.colors['accent_primary'])
         self.file_path_entry.pack(side=tk.LEFT, padx=(10, 10), pady=10)
         
         # Browse button
-        browse_btn = tk.Button(file_frame, text="Browse", command=self.browse_file,
-                             bg='#4CAF50', fg='white', font=("Arial", 10, "bold"))
-        browse_btn.pack(side=tk.RIGHT, padx=(0, 10), pady=10)
+        self.browse_btn = tk.Button(file_frame, text="Browse", command=self.browse_file,
+                                   bg=self.colors['button_primary'], 
+                                   fg=self.colors['text_primary'], 
+                                   font=("Helvetica", 10, "bold"),
+                                   relief=tk.FLAT, padx=20, cursor="hand2")
+        self.browse_btn.pack(side=tk.RIGHT, padx=(0, 10), pady=10)
         
         # Convert button
-        convert_btn = tk.Button(main_frame, text="Convert to Strapi Layout", 
-                              command=self.convert_document,
-                              bg='#2196F3', fg='white', font=("Arial", 12, "bold"),
-                              height=2)
-        convert_btn.pack(pady=20)
+        self.convert_btn = tk.Button(main_frame, text="Convert to Strapi Layout", 
+                                    command=self.convert_document,
+                                    bg=self.colors['button_secondary'], 
+                                    fg=self.colors['text_primary'], 
+                                    font=("Helvetica", 14, "bold"),
+                                    relief=tk.FLAT, padx=30, pady=10, cursor="hand2")
+        self.convert_btn.pack(pady=20)
         
         # Results frame
         results_frame = tk.LabelFrame(main_frame, text="Extracted Data", 
-                                    bg='#f0f0f0', font=("Arial", 12, "bold"))
+                                    bg=self.colors['bg_secondary'], 
+                                    fg=self.colors['text_primary'],
+                                    font=("Helvetica", 12, "bold"))
         results_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 20))
         
         # Create text widget with scrollbar
-        text_frame = tk.Frame(results_frame)
+        text_frame = tk.Frame(results_frame, bg=self.colors['bg_secondary'])
         text_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
-        self.results_text = tk.Text(text_frame, wrap=tk.WORD, font=("Courier", 10))
+        self.results_text = tk.Text(text_frame, wrap=tk.WORD, font=("Consolas", 10),
+                                   bg=self.colors['bg_accent'], 
+                                   fg=self.colors['text_primary'],
+                                   insertbackground=self.colors['accent_primary'],
+                                   selectbackground=self.colors['accent_primary'],
+                                   selectforeground=self.colors['bg_primary'])
         scrollbar = tk.Scrollbar(text_frame, orient=tk.VERTICAL, command=self.results_text.yview)
         self.results_text.configure(yscrollcommand=scrollbar.set)
         
@@ -88,9 +151,12 @@ class WordToStrapiConverter:
         # Status bar
         self.status_var = tk.StringVar()
         self.status_var.set("Ready to convert Word documents")
-        status_bar = tk.Label(main_frame, textvariable=self.status_var, 
-                            relief=tk.SUNKEN, anchor=tk.W, bg='#e0e0e0')
-        status_bar.pack(fill=tk.X, pady=(10, 0))
+        self.status_bar = tk.Label(main_frame, textvariable=self.status_var, 
+                                 relief=tk.FLAT, anchor=tk.W, 
+                                 bg=self.colors['bg_secondary'], 
+                                 fg=self.colors['text_secondary'],
+                                 font=("Helvetica", 10))
+        self.status_bar.pack(fill=tk.X, pady=(10, 0))
     
     def browse_file(self):
         """Open file dialog to select Word document"""
@@ -101,6 +167,7 @@ class WordToStrapiConverter:
         if file_path:
             self.file_path_var.set(file_path)
             self.status_var.set(f"Selected file: {os.path.basename(file_path)}")
+            self.status_bar.configure(fg=self.colors['success'])
     
     def extract_table_data(self, doc):
         """Extract data from the table at the beginning of the document"""
@@ -187,6 +254,7 @@ class WordToStrapiConverter:
         
         try:
             self.status_var.set("Processing document...")
+            self.status_bar.configure(fg=self.colors['warning'])
             self.root.update()
             
             # Load the Word document
@@ -208,10 +276,12 @@ class WordToStrapiConverter:
             self.save_strapi_file(strapi_data, file_path)
             
             self.status_var.set("Conversion completed successfully!")
+            self.status_bar.configure(fg=self.colors['success'])
             
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
             self.status_var.set("Error during conversion")
+            self.status_bar.configure(fg=self.colors['error'])
     
     def display_results(self, table_data, content, strapi_data):
         """Display the extracted data in the results area"""
